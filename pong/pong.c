@@ -10,31 +10,22 @@
 #define GREEN_LED BIT6
 
 
-AbRect rect10 = {abRectGetBounds, abRectCheck, {10,10}}; /**< 10x10 rectangle */
-AbRArrow rightArrow = {abRArrowGetBounds, abRArrowCheck, 30};
+AbRect pad1 = {abRectGetBounds, abRectCheck, {1,12}}; // 1x10 rect paddle 1
+AbRect pad2 = {abRectGetBounds, abRectCheck, {1,12}}; // 1x10 rect paddle 2
 
 AbRectOutline fieldOutline = {	/* playing field */
   abRectOutlineGetBounds, abRectOutlineCheck,   
-  {screenWidth/2 - 10, screenHeight/2 - 10}
-};
-
-Layer layer4 = {
-  (AbShape *)&rightArrow,
-  {(screenWidth/2)+10, (screenHeight/2)+5}, /**< bit below & right of center */
-  {0,0}, {0,0},				    /* last & next pos */
-  COLOR_PINK,
-  0
+  {screenWidth/2 - 2, screenHeight/2 - 10}
 };
   
 
-Layer layer3 = {		/**< Layer with an orange circle */
-  (AbShape *)&circle8,
-  {(screenWidth/2)+10, (screenHeight/2)+5}, /**< bit below & right of center */
+Layer layer3 = {	    /**< Layer with an blue circle(puck) */
+  (AbShape *)&circle4,
+  {(screenWidth/2), (screenHeight/2)}, /**< center */
   {0,0}, {0,0},				    /* last & next pos */
-  COLOR_VIOLET,
-  &layer4,
+  COLOR_BLUE,
+  0
 };
-
 
 Layer fieldLayer = {		/* playing field as a layer */
   (AbShape *) &fieldOutline,
@@ -44,21 +35,22 @@ Layer fieldLayer = {		/* playing field as a layer */
   &layer3
 };
 
-Layer layer1 = {		/**< Layer with a red square */
-  (AbShape *)&rect10,
-  {screenWidth/2, screenHeight/2}, /**< center */
-  {0,0}, {0,0},				    /* last & next pos */
-  COLOR_RED,
-  &fieldLayer,
+Layer layer2 = {               /**< Layer with a black square (paddle2) */
+  (AbShape *)&pad2,
+  {screenWidth-5, screenHeight/2}, /**< middle 5 from right */
+  {0,0}, {0,0},                              /* last & next pos */
+  COLOR_BLACK,
+  &fieldLayer
 };
 
-Layer layer0 = {		/**< Layer with an orange circle */
-  (AbShape *)&circle14,
-  {(screenWidth/2)+10, (screenHeight/2)+5}, /**< bit below & right of center */
+Layer layer1 = {		/**< Layer with a black square (paddle1) */
+  (AbShape *)&pad1,
+  {5, screenHeight/2}, /**< middle 5 from left */
   {0,0}, {0,0},				    /* last & next pos */
-  COLOR_ORANGE,
-  &layer1,
+  COLOR_BLACK,
+  &layer2,
 };
+
 
 /** Moving Layer
  *  Linked list of layer references
@@ -71,9 +63,7 @@ typedef struct MovLayer_s {
 } MovLayer;
 
 /* initial value of {0,0} will be overwritten */
-MovLayer ml3 = { &layer3, {1,1}, 0 }; /**< not all layers move */
-MovLayer ml1 = { &layer1, {1,2}, &ml3 }; 
-MovLayer ml0 = { &layer0, {2,1}, &ml1 }; 
+MovLayer ml3 = { &layer3, {2,2}, 0 }; /**< not all layers move (puck)*/  
 
 void movLayerDraw(MovLayer *movLayers, Layer *layers)
 {
@@ -141,8 +131,8 @@ void mlAdvance(MovLayer *ml, Region *fence)
 }
 
 
-u_int bgColor = COLOR_BLUE;     /**< The background color */
-int redrawScreen = 1;           /**< Boolean for whether screen needs to be redrawn */
+u_int bgColor = COLOR_GREEN;     /**< The background color */
+int redrawScreen = 1;           /**< Boolean whether screen need redrawn */
 
 Region fieldFence;		/**< fence around playing field  */
 
@@ -162,10 +152,14 @@ void main()
 
   shapeInit();
 
-  layerInit(&layer0);
-  layerDraw(&layer0);
+  
+  layerInit(&layer1);
+  layerDraw(&layer1);
 
 
+  drawString5x7(25,2,"Score:", COLOR_BLACK, COLOR_GREEN);
+
+  
   layerGetBounds(&fieldLayer, &fieldFence);
 
 
@@ -180,7 +174,7 @@ void main()
     }
     P1OUT |= GREEN_LED;       /**< Green led on when CPU on */
     redrawScreen = 0;
-    movLayerDraw(&ml0, &layer0);
+    movLayerDraw(&ml3, &layer1);
   }
 }
 
@@ -191,7 +185,7 @@ void wdt_c_handler()
   P1OUT |= GREEN_LED;		      /**< Green LED on when cpu on */
   count ++;
   if (count == 15) {
-    mlAdvance(&ml0, &fieldFence);
+    mlAdvance(&ml3, &fieldFence);
     if (p2sw_read())
       redrawScreen = 1;
     count = 0;
