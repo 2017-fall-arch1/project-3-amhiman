@@ -142,6 +142,7 @@ void mlAdvance(MovLayer *ml, Region *fence, Region *pad1Fence, Region *pad2Fence
 	int velocity = ml->velocity.axes[axis] = -ml->velocity.axes[axis];
 	newPos.axes[axis] += (2*velocity);
 	hitPaddle = 1;  //hitPaddle == true
+	break;
       }
 
       // if puck collides with pad2
@@ -149,6 +150,7 @@ void mlAdvance(MovLayer *ml, Region *fence, Region *pad1Fence, Region *pad2Fence
 	int velocity = ml->velocity.axes[axis] = -ml->velocity.axes[axis];
 	newPos.axes[axis] += (2*velocity);
 	hitPaddle = 1;  //hitPaddle == true
+	break;
       }
       
       // if out of bounds
