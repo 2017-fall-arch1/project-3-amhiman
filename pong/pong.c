@@ -138,14 +138,14 @@ void mlAdvance(MovLayer *ml, Region *fence, Region *pad1Fence, Region *pad2Fence
       }
 
       // if puck collides with pad1 
-      if ((shapeBoundary.topLeft.axes[0] < pad1Fence->botRight.axes[0]) &&               (shapeBoundary.botRight.axes[1] > pad1Fence->topLeft.axes[1]) &&               (shapeBoundary.botRight.axes[1] < pad1Fence->botRight.axes[1])) {
+      if ((shapeBoundary.topLeft.axes[0] < pad1Fence->botRight.axes[0]) &&               (shapeBoundary.botRight.axes[1] > pad1Fence->topLeft.axes[1]) &&               (shapeBoundary.topLeft.axes[1] < pad1Fence->botRight.axes[1])) {
 	int velocity = ml->velocity.axes[axis] = -ml->velocity.axes[axis];
 	newPos.axes[axis] += (2*velocity);
 	hitPaddle = 1;  //hitPaddle == true
       }
 
       // if puck collides with pad2
-      if ((shapeBoundary.botRight.axes[0] > pad2Fence->topLeft.axes[0]) &&               (shapeBoundary.botRight.axes[1] > pad2Fence->topLeft.axes[1]) &&               (shapeBoundary.botRight.axes[1] < pad2Fence->botRight.axes[1])) {
+      if ((shapeBoundary.botRight.axes[0] > pad2Fence->topLeft.axes[0]) &&               (shapeBoundary.botRight.axes[1] > pad2Fence->topLeft.axes[1]) &&               (shapeBoundary.topLeft.axes[1] < pad2Fence->botRight.axes[1])) {
 	int velocity = ml->velocity.axes[axis] = -ml->velocity.axes[axis];
 	newPos.axes[axis] += (2*velocity);
 	hitPaddle = 1;  //hitPaddle == true
