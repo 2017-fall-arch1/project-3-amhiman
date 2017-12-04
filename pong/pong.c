@@ -109,6 +109,8 @@ void movLayerDraw(MovLayer *movLayers, Layer *layers)
 
 //Region fence = {{10,30}, {SHORT_EDGE_PIXELS-10, LONG_EDGE_PIXELS-10}}; /**< Create a fence region */
 
+char score= 0; 
+char scoreString[5];    /**< conver char to a "string" */
 
 
 /** Advances a moving shape within a fence
@@ -121,6 +123,8 @@ void mlAdvance(MovLayer *ml, Region *fence, Region *pad1Fence, Region *pad2Fence
   Vec2 newPos;
   u_char axis;
   Region shapeBoundary;
+  char hitPaddle = 0;             // boolean if hit paddle or not
+    
   for (; ml; ml = ml->next) {
     vec2Add(&newPos, &ml->layer->posNext, &ml->velocity);
     abShapeGetBounds(ml->layer->abShape, &newPos, &shapeBoundary);
@@ -137,6 +141,7 @@ void mlAdvance(MovLayer *ml, Region *fence, Region *pad1Fence, Region *pad2Fence
       {
 	int velocity = ml->velocity.axes[axis] = -ml->velocity.axes[axis];
 	newPos.axes[axis] += (2*velocity);
+	hitPaddle = 1;  //hitPaddle == true
       } /**< if collide with pad1 */
 
       // if puck collides with pad2
@@ -144,9 +149,14 @@ void mlAdvance(MovLayer *ml, Region *fence, Region *pad1Fence, Region *pad2Fence
       {
 	int velocity = ml->velocity.axes[axis] = -ml->velocity.axes[axis];
 	newPos.axes[axis] += (2*velocity);
+	hitPaddle = 1;  //hitPaddle == true
       }
       
     } /**< for axis */
+
+    if (hitPaddle)  // inc score if a paddle
+      score++;
+    
     ml->layer->posNext = newPos;
   } /**< for ml */
 }
@@ -162,8 +172,6 @@ Region fieldFence;		/**< fence around playing field  */
 Region pad1Fence;               /**< fence around paddle 1*/
 Region pad2Fence;               /**< fence around paddle 2*/
 
-char score= 0; 
-char scoreString[5];    /**< conver char to "string" */
 
 /** Initializes everything, enables interrupts and green LED, 
  *  and handles the rendering for the screen
@@ -184,10 +192,6 @@ void main()
   layerInit(&padLayer1);
   layerDraw(&padLayer1);
 
-  // displaying score
-  drawString5x7(25,2,"Score:", COLOR_BLACK, COLOR_GREEN);
-  itoa(score, scoreString, 10); /**< convert to "string" */
-  drawString5x7(100,2,scoreString, COLOR_BLACK, COLOR_GREEN);
 
   // bounds of layers
   layerGetBounds(&fieldLayer, &fieldFence);
@@ -206,6 +210,12 @@ void main()
     P1OUT |= GREEN_LED;       /**< Green led on when CPU on */
     redrawScreen = 0;
     movLayerDraw(&ml3, &padLayer1);
+
+    // displaying score
+    drawString5x7(25,2,"Score:", COLOR_BLACK, COLOR_GREEN);
+    itoa(score, scoreString, 10); /**< convert to "string" */
+    drawString5x7(100,2,scoreString, COLOR_BLACK, COLOR_GREEN);
+
   }
 }
 
