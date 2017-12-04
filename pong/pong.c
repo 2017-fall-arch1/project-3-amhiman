@@ -65,6 +65,8 @@ typedef struct MovLayer_s {
 
 /* initial value of {0,0} will be overwritten */
 MovLayer ml3 = { &puckLayer3, {2,2}, 0 }; /**< not all layers move (puck)*/  
+MovLayer mlPad1 = { &padLayer1, {0,2}, 0};
+MovLayer mlPad2 = { &padLayer2, {0,2}, 0};
 
 void movLayerDraw(MovLayer *movLayers, Layer *layers)
 {
@@ -174,7 +176,7 @@ void main()
   configureClocks();
   lcd_init();
   shapeInit();
-  p2sw_init(1);
+  p2sw_init(15);
 
   shapeInit();
 
@@ -207,6 +209,34 @@ void main()
   }
 }
 
+
+
+
+
+void movePaddle(char paddle, char dir)
+{
+  if (paddle == 'L') {
+    if (dir == 'U') 
+      mlPad1.layer->posNext.axes[1]-=3;
+    else 
+      mlPad1.layer->posNext.axes[1]+=3;
+      
+    layerGetBounds(&padLayer1, &pad1Fence);
+    movLayerDraw(&mlPad1, &padLayer1);
+  }
+  else {
+    if (dir == 'U')
+      mlPad2.layer->posNext.axes[1]-=3;
+    else
+      mlPad2.layer->posNext.axes[1]+=3;
+
+    layerGetBounds(&padLayer2, &pad2Fence);
+    movLayerDraw(&mlPad2, &padLayer2);
+  }
+}
+
+
+
 /** Watchdog timer interrupt handler. 15 interrupts/sec */
 void wdt_c_handler()
 {
@@ -215,9 +245,25 @@ void wdt_c_handler()
   count ++;
   if (count == 15) {
     mlAdvance(&ml3, &fieldFence, &pad1Fence, &pad2Fence);
-    if (p2sw_read())
-      redrawScreen = 1;
+    redrawScreen = 1;
+    
+    // switch one (move left paddle up)
+    if (~p2sw_read() & 0x01) {
+      movePaddle('L','U');
+    }
+    if (~p2sw_read() & 0x02) {
+      movePaddle('L','D');   
+    }
+    if (~p2sw_read() & 0x04) {
+      movePaddle('R','U');
+    }
+    if (~p2sw_read() & 0x08) {
+      movePaddle('R','D');
+    }
+    
     count = 0;
   } 
   P1OUT &= ~GREEN_LED;		    /**< Green LED off when cpu off */
 }
+
+
