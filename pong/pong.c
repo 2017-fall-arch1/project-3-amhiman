@@ -1,5 +1,6 @@
-  
+
 #include <msp430.h>
+#include <stdlib.h>
 #include <libTimer.h>
 #include <lcdutils.h>
 #include <lcddraw.h>
@@ -106,6 +107,8 @@ void movLayerDraw(MovLayer *movLayers, Layer *layers)
 
 //Region fence = {{10,30}, {SHORT_EDGE_PIXELS-10, LONG_EDGE_PIXELS-10}}; /**< Create a fence region */
 
+
+
 /** Advances a moving shape within a fence
  *  
  *  \param ml The moving shape to be advanced
@@ -119,6 +122,7 @@ void mlAdvance(MovLayer *ml, Region *fence, Region *pad1Fence, Region *pad2Fence
   for (; ml; ml = ml->next) {
     vec2Add(&newPos, &ml->layer->posNext, &ml->velocity);
     abShapeGetBounds(ml->layer->abShape, &newPos, &shapeBoundary);
+    
     for (axis = 0; axis < 2; axis ++) {
       if ((shapeBoundary.topLeft.axes[axis] < fence->topLeft.axes[axis]) ||
 	  (shapeBoundary.botRight.axes[axis] > fence->botRight.axes[axis]) ) {
@@ -156,6 +160,9 @@ Region fieldFence;		/**< fence around playing field  */
 Region pad1Fence;               /**< fence around paddle 1*/
 Region pad2Fence;               /**< fence around paddle 2*/
 
+char score= 0; 
+char scoreString[5];    /**< conver char to "string" */
+
 /** Initializes everything, enables interrupts and green LED, 
  *  and handles the rendering for the screen
  */
@@ -175,10 +182,12 @@ void main()
   layerInit(&padLayer1);
   layerDraw(&padLayer1);
 
-
+  // displaying score
   drawString5x7(25,2,"Score:", COLOR_BLACK, COLOR_GREEN);
+  itoa(score, scoreString, 10); /**< convert to "string" */
+  drawString5x7(100,2,scoreString, COLOR_BLACK, COLOR_GREEN);
 
-  
+  // bounds of layers
   layerGetBounds(&fieldLayer, &fieldFence);
   layerGetBounds(&padLayer1, &pad1Fence);
   layerGetBounds(&padLayer2, &pad2Fence);
