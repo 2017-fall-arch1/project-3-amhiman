@@ -130,28 +130,35 @@ void mlAdvance(MovLayer *ml, Region *fence, Region *pad1Fence, Region *pad2Fence
     abShapeGetBounds(ml->layer->abShape, &newPos, &shapeBoundary);
     
     for (axis = 0; axis < 2; axis ++) {
+      // if outside of fence
       if ((shapeBoundary.topLeft.axes[axis] < fence->topLeft.axes[axis]) ||
 	  (shapeBoundary.botRight.axes[axis] > fence->botRight.axes[axis]) ) {
 	int velocity = ml->velocity.axes[axis] = -ml->velocity.axes[axis];
 	newPos.axes[axis] += (2*velocity);
-      }	/**< if outside of fence */
+      }
 
       // if puck collides with pad1 
-      if ((shapeBoundary.topLeft.axes[0] < pad1Fence->botRight.axes[0]) &&               (shapeBoundary.botRight.axes[1] > pad1Fence->topLeft.axes[1]) &&               (shapeBoundary.botRight.axes[1] < pad1Fence->botRight.axes[1]))
-      {
+      if ((shapeBoundary.topLeft.axes[0] < pad1Fence->botRight.axes[0]) &&               (shapeBoundary.botRight.axes[1] > pad1Fence->topLeft.axes[1]) &&               (shapeBoundary.botRight.axes[1] < pad1Fence->botRight.axes[1])) {
 	int velocity = ml->velocity.axes[axis] = -ml->velocity.axes[axis];
 	newPos.axes[axis] += (2*velocity);
 	hitPaddle = 1;  //hitPaddle == true
-      } /**< if collide with pad1 */
+      }
 
       // if puck collides with pad2
-      if ((shapeBoundary.botRight.axes[0] > pad2Fence->topLeft.axes[0]) &&               (shapeBoundary.botRight.axes[1] > pad2Fence->topLeft.axes[1]) &&               (shapeBoundary.botRight.axes[1] < pad2Fence->botRight.axes[1]))
-      {
+      if ((shapeBoundary.botRight.axes[0] > pad2Fence->topLeft.axes[0]) &&               (shapeBoundary.botRight.axes[1] > pad2Fence->topLeft.axes[1]) &&               (shapeBoundary.botRight.axes[1] < pad2Fence->botRight.axes[1])) {
 	int velocity = ml->velocity.axes[axis] = -ml->velocity.axes[axis];
 	newPos.axes[axis] += (2*velocity);
 	hitPaddle = 1;  //hitPaddle == true
       }
       
+      // if out of bounds
+      if ((shapeBoundary.topLeft.axes[0] <= fence->topLeft.axes[0]) || (shapeBoundary.botRight.axes[0] >= fence->botRight.axes[0])) {
+        score = 0; // reset score
+	Vec2 temp = {screenWidth/2,screenHeight/2};   // reset to center
+	newPos = temp;
+      }
+	
+	
     } /**< for axis */
 
     if (hitPaddle)  // inc score if a paddle
