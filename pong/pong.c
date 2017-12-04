@@ -216,18 +216,18 @@ void main()
 void movePaddle(char paddle, char dir)
 {
   if (paddle == 'L') {
-    if (dir == 'U') 
+    if ((dir == 'U') && (mlPad1.layer->posNext.axes[1]-3 >= 25))
       mlPad1.layer->posNext.axes[1]-=3;
-    else 
+    else if ((dir == 'D') && (mlPad1.layer->posNext.axes[1]+3 <= screenHeight -25))
       mlPad1.layer->posNext.axes[1]+=3;
       
     layerGetBounds(&padLayer1, &pad1Fence);
     movLayerDraw(&mlPad1, &padLayer1);
   }
   else {
-    if (dir == 'U')
+    if ((dir == 'U') && (mlPad2.layer->posNext.axes[1]-3 >= 25))
       mlPad2.layer->posNext.axes[1]-=3;
-    else
+    else if ((dir =='D') && (mlPad2.layer->posNext.axes[1]+3 <= screenHeight -25))
       mlPad2.layer->posNext.axes[1]+=3;
 
     layerGetBounds(&padLayer2, &pad2Fence);
