@@ -147,7 +147,7 @@ void mlAdvance(MovLayer *ml, Region *fence, Region *pad1Fence, Region *pad2Fence
 	int velocity = ml->velocity.axes[axis] = -ml->velocity.axes[axis];
 	newPos.axes[axis] += (2*velocity);
 	hitPaddle = 1;  //hitPaddle == true
-	speaker_state(2);   // hit paddle noise
+	speaker_state(1);   // hit paddle noise
 	break;
       }
 
@@ -156,14 +156,14 @@ void mlAdvance(MovLayer *ml, Region *fence, Region *pad1Fence, Region *pad2Fence
 	int velocity = ml->velocity.axes[axis] = -ml->velocity.axes[axis];
 	newPos.axes[axis] += (2*velocity);
 	hitPaddle = 1;  //hitPaddle == true
-	speaker_state(2);   // hit paddle noise
+	speaker_state(1);   // hit paddle noise
 	break;
       }
       
       // if out of bounds
       if ((shapeBoundary.topLeft.axes[0] <= fence->topLeft.axes[0]) || (shapeBoundary.botRight.axes[0] >= fence->botRight.axes[0])) {
         score = 0; // reset score
-	speaker_state(3);   // out of bounds noise
+	speaker_state(2);   // out of bounds noise
 	Vec2 temp = {screenWidth/2,screenHeight/2};   // reset to center
 	newPos = temp;
       }
