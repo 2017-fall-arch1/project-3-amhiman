@@ -2,6 +2,6 @@
 #define speakerState_included
 
 // change_state() handles state transitions
-void change_state();
+void speaker_state(char state);
 
 #endif // included

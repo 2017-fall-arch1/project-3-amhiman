@@ -7,7 +7,8 @@
 #include <p2switches.h>
 #include <shape.h>
 #include <abCircle.h>
-#include <speakerState.h>
+#include "speakerState.h"
+#include "speaker.h"
 
 #define GREEN_LED BIT6
 
@@ -125,12 +126,15 @@ void mlAdvance(MovLayer *ml, Region *fence, Region *pad1Fence, Region *pad2Fence
   u_char axis;
   Region shapeBoundary;
   char hitPaddle = 0;             // boolean if hit paddle or not
-    
+
+  speaker_init();  // no noise
+  
   for (; ml; ml = ml->next) {
     vec2Add(&newPos, &ml->layer->posNext, &ml->velocity);
     abShapeGetBounds(ml->layer->abShape, &newPos, &shapeBoundary);
     
     for (axis = 0; axis < 2; axis ++) {
+      
       // if outside of fence
       if ((shapeBoundary.topLeft.axes[axis] < fence->topLeft.axes[axis]) ||
 	  (shapeBoundary.botRight.axes[axis] > fence->botRight.axes[axis]) ) {
@@ -143,6 +147,7 @@ void mlAdvance(MovLayer *ml, Region *fence, Region *pad1Fence, Region *pad2Fence
 	int velocity = ml->velocity.axes[axis] = -ml->velocity.axes[axis];
 	newPos.axes[axis] += (2*velocity);
 	hitPaddle = 1;  //hitPaddle == true
+	speaker_state(2);   // hit paddle noise
 	break;
       }
 
@@ -151,12 +156,14 @@ void mlAdvance(MovLayer *ml, Region *fence, Region *pad1Fence, Region *pad2Fence
 	int velocity = ml->velocity.axes[axis] = -ml->velocity.axes[axis];
 	newPos.axes[axis] += (2*velocity);
 	hitPaddle = 1;  //hitPaddle == true
+	speaker_state(2);   // hit paddle noise
 	break;
       }
       
       // if out of bounds
       if ((shapeBoundary.topLeft.axes[0] <= fence->topLeft.axes[0]) || (shapeBoundary.botRight.axes[0] >= fence->botRight.axes[0])) {
         score = 0; // reset score
+	speaker_state(3);   // out of bounds noise
 	Vec2 temp = {screenWidth/2,screenHeight/2};   // reset to center
 	newPos = temp;
       }
@@ -168,7 +175,9 @@ void mlAdvance(MovLayer *ml, Region *fence, Region *pad1Fence, Region *pad2Fence
       score++;
     
     ml->layer->posNext = newPos;
+
   } /**< for ml */
+
 }
 
 
@@ -195,6 +204,7 @@ void main()
   lcd_init();
   shapeInit();
   p2sw_init(15);
+  speaker_init();
 
   shapeInit();
 
@@ -262,6 +272,7 @@ void wdt_c_handler()
 {
   static short count = 0;
   P1OUT |= GREEN_LED;		      /**< Green LED on when cpu on */
+
   count ++;
   if (count == 15) {
     mlAdvance(&ml3, &fieldFence, &pad1Fence, &pad2Fence);
@@ -271,16 +282,22 @@ void wdt_c_handler()
     if (~p2sw_read() & 0x01) {
       movePaddle('L','U');
     }
+
+    // switch two (move left paddle down)
     if (~p2sw_read() & 0x02) {
       movePaddle('L','D');   
     }
+
+    // switch three (move right paddle up)
     if (~p2sw_read() & 0x04) {
       movePaddle('R','U');
     }
+
+    // switch four (move right paddle down)
     if (~p2sw_read() & 0x08) {
       movePaddle('R','D');
     }
-    
+
     count = 0;
   } 
   P1OUT &= ~GREEN_LED;		    /**< Green LED off when cpu off */
