@@ -6,7 +6,7 @@
 	;; the state machine uses a switch statement
 	
 	.data			;s is static (in ram)
-S:	.word 0 		; selector (which state)
+s:	.word 0 		; selector (which state)
 
 	.text			; jt is constants (in flash)
 jt:	.word option1		; jt[0]
@@ -17,7 +17,7 @@ jt:	.word option1		; jt[0]
 	.global speaker_state
 speaker_state:
 	;; range check on selector (s)
-	mov r12, &s		; arg in r12 (state)
+	mov r12, &s		;arg in r12 (state)
 	
 	cmp #3, &s		; s-3
 	jnc default		; doesn't brrow if s>2
