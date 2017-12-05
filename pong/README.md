@@ -21,6 +21,8 @@ Move the paddles to keep the ball from going out of bounds.
 
 The score will increase with each time the ball touches a paddle.
 
+If the ball hits behind the paddle on the left or right side, the score will reset to 0 and the ball will reset back to the center.
+
 Switch 1: Moves the left paddle up
 
 Switch 2: Moves the left paddle down

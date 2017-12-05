@@ -7,8 +7,7 @@
 void speaker_state(char state) {
   
   // switch over called state
-  switch (state) {
-  
+  switch (state) {  
 
   // ball hit paddle sound
   case 1:
