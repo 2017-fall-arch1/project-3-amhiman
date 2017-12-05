@@ -283,6 +283,7 @@ void wdt_c_handler()
   if (count == 15) {
     mlAdvance(&mlPuck, &fieldFence, &pad1Fence, &pad2Fence);
     redrawScreen = 1;
+
     
     // switch one (move left paddle up)
     if (~p2sw_read() & 0x01) {
