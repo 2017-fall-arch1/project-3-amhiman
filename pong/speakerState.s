@@ -4,6 +4,7 @@
 
 	;; speaker_state is the state mach in to handle speaker states
 	;; the state machine uses a switch statement
+
 	
 	.data			;s is static (in ram)
 s:	.word 0 		; selector (which state)
