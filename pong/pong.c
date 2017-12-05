@@ -7,6 +7,7 @@
 #include <p2switches.h>
 #include <shape.h>
 #include <abCircle.h>
+#include <speakerState.h>
 
 #define GREEN_LED BIT6
 
